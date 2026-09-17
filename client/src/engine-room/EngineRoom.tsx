@@ -102,7 +102,15 @@ export function EngineRoom() {
 
       <section className="panel">
         <h2>4. Database</h2>
-        {databaseError && <p className="bad">Could not reach the server: {databaseError}</p>}
+        {databaseError && (
+          <>
+            <p className="bad">Could not reach the server: {databaseError}</p>
+            <p className="muted">
+              Nothing is answering at that address. On the published site only the browser
+              half of this application is deployed, so there is no server and no database.
+            </p>
+          </>
+        )}
         {!database && !databaseError && <p className="muted">Asking the server...</p>}
         {database && (
           <table>

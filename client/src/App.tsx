@@ -5,7 +5,7 @@ import { EngineRoom } from './engine-room/EngineRoom';
 
 export function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <GameProvider>
         <Routes>
           <Route path="/" element={<GamePage />} />

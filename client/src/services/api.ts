@@ -50,7 +50,7 @@ export interface TestRun {
  */
 export async function fetchTestRun(): Promise<TestRun | null> {
   try {
-    const response = await fetch('/test-results.json');
+    const response = await fetch(`${import.meta.env.BASE_URL}test-results.json`);
     if (!response.ok) return null;
     return (await response.json()) as TestRun;
   } catch {

@@ -1,0 +1,63 @@
+# Publishes the CLIENT to GitHub Pages.
+#
+# Only the browser half of the application goes up here. GitHub Pages serves
+# files, it does not run Node, so the Express server and the MongoDB connection
+# are not deployed. The Engine Room will say so honestly on the published site.
+
+name: Deploy client to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        working-directory: client
+        run: npm ci
+
+      # Run the tests for real, so the Engine Room's Tests panel shows a real result.
+      - name: Test
+        working-directory: client
+        run: npm run test:report
+
+      - name: Build
+        working-directory: client
+        run: npm run build
+
+      # GitHub Pages has no server to hand unknown paths to our router,
+      # so /engine-room needs the same page as /.
+      - name: Add SPA fallback
+        run: cp client/dist/index.html client/dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
